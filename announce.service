@@ -1,0 +1,11 @@
+[Unit]
+Description=Announce Service
+After=network-online.target
+ 
+[Service]
+ExecStart=/usr/bin/forever /home/pi/announce/index.js
+StandardOutput=syslog
+
+[Install]
+WantedBy=multi-user.target
+Alias=announce.service
