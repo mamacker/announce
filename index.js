@@ -47,25 +47,29 @@ process.on('SIGINT', function() {
 
 function numberSet(which) {
   var lampPin = pins[which];
-  gpio.setup(lampPin, gpio.DIR_OUT, (err) => {
-    console.log("Setting pin " + lampPin + " off.");
-    gpio.write(lampPin, (lampPin == 18 ? false : true), (err) => {
-      if (err) {
-        console.log("Error in setting gpio pin.",err);
-        return;
-      }
-    
-      setTimeout(() => {
-        console.log("Setting pin " + lampPin + " on.");
-        gpio.write(lampPin, (lampPin == 18 ? true: false), (err) => {
-          if (err) {
-            console.log("Error in setting gpio pin.",err);
-            return;
-          }
-        });
-      }, 1000);
+  if (lampPin) {
+    gpio.setup(lampPin, gpio.DIR_OUT, (err) => {
+      console.log("Setting pin " + lampPin + " off.");
+      gpio.write(lampPin, (lampPin == 18 ? false : true), (err) => {
+        if (err) {
+          console.log("Error in setting gpio pin.",err);
+          return;
+        }
+      
+        setTimeout(() => {
+          console.log("Setting pin " + lampPin + " on.");
+          gpio.write(lampPin, (lampPin == 18 ? true: false), (err) => {
+            if (err) {
+              console.log("Error in setting gpio pin.",err);
+              return;
+            }
+          });
+        }, 1000);
+      });
     });
-  });
+  } else {
+    console.log("Invalid pin: ", which);
+  }
 }
 
 app.get('/select', function(req, res) {
@@ -79,3 +83,41 @@ app.get('/select', function(req, res) {
   }
   res.end();
 });
+
+app.get('/walk', function(req, res) {
+  res.setHeader('Content-Type', 'text/javascript');
+  res.write(JSON.stringify({done:false}));
+  walkNumbers();
+  res.end();
+});
+
+app.get('/rand', function(req, res) {
+  res.setHeader('Content-Type', 'text/javascript');
+  res.write(JSON.stringify({done:false}));
+  randomWalk();
+  res.end();
+});
+
+function randomWalk() {
+  for (var i = 0; i <= 6; i++ ) {
+    setTimeout((function(i){ 
+      return () => {
+        var index = Math.floor(Math.random() * 10) % 7;
+        numberSet(index);
+      }; 
+    })(i), i * 1000);
+  }
+
+  setTimeout(() => { numberSet("reset"); }, 7000);
+}
+
+
+function walkNumbers() {
+  for (var i = 0; i <= 6; i++ ) {
+    setTimeout((function(i){ return () => {numberSet(i);}; })(i), i * 1000);
+  }
+
+  setTimeout(() => { numberSet("reset"); }, 7000);
+}
+
+walkNumbers();
