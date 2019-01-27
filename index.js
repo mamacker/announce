@@ -7,7 +7,7 @@ app.listen(80, function() {
 });
 
 var pins = {
-  1: 5, 
+  1: 23, 
   2: 16, 
   3: 26, 
   4: 21, 
