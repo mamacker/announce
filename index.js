@@ -1,5 +1,7 @@
 var express = require('express');
 var app = express();
+const https = require('https');
+
 var gpio = require('rpi-gpio');
 gpio.setMode(gpio.MODE_BCM);
 app.listen(80, function() {
@@ -121,3 +123,8 @@ function walkNumbers() {
 }
 
 walkNumbers();
+
+
+setInterval(() => {
+  https.get("https://theamackers.com/storeip", () => {});
+}, 1000 * 60 * 60 * 10);
