@@ -57,7 +57,7 @@ function numberSet(which) {
           console.log("Error in setting gpio pin.",err);
           return;
         }
-      
+
         setTimeout(() => {
           console.log("Setting pin " + lampPin + " on.");
           gpio.write(lampPin, (lampPin == 18 ? true: false), (err) => {
@@ -128,3 +128,29 @@ walkNumbers();
 setInterval(() => {
   https.get("https://theamackers.com/storeip", () => {});
 }, 1000 * 60 * 60 * 10);
+https.get("https://theamackers.com/storeip", () => {});
+
+const { execSync } = require('child_process');
+let numUsers = 0;
+setTimeout(() => {
+  setInterval(() => {
+    let stdout = execSync('users');
+    console.log("Command results:", stdout + "");
+    newNumUsers = (stdout+"").split(/ /).length;
+    if (newNumUsers != numUsers) {
+      let resetTimeout = 0;
+      if (newNumUsers < numUsers) {
+        numberSet("reset");
+        resetTimeout = 2000;
+      }
+
+      numUsers = newNumUsers;
+
+      setTimeout(() => {
+        for (let i = 1; i < numUsers; i++) {
+          numberSet(i);
+        }
+      }, resetTimeout);
+    }
+  }, 1000);
+}, 10000);
