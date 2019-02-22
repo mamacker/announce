@@ -147,7 +147,7 @@ setTimeout(() => {
       numUsers = newNumUsers;
 
       setTimeout(() => {
-        for (let i = 1; i < numUsers; i++) {
+        for (let i = 1; i < numUsers && i < 7; i++) {
           numberSet(i);
         }
       }, resetTimeout);
