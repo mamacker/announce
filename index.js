@@ -1,10 +1,22 @@
 var express = require('express');
 var app = express();
 const https = require('https');
+const FauxMo = require('fauxmojs');
+const os = require('os');
+const dns = require('dns');
+
+let ipAddress = '';
+dns.lookup(os.hostname()+".local", (e,a,f) => {
+  console.log("IP address: ", a, "Errors: ", e);
+  ipAddress = a;
+  setTimeout(() => {
+    startFauxMo();
+  }, 1000);
+});
 
 var gpio = require('rpi-gpio');
 gpio.setMode(gpio.MODE_BCM);
-app.listen(80, function() {
+app.listen(8080, function() {
   console.log("Server started.");
 });
 
@@ -124,6 +136,20 @@ function walkNumbers() {
 
 walkNumbers();
 
+function startFauxMo() {
+  let fauxMo = new FauxMo({
+    ipAddress: ipAddress,
+    devices: [{
+        name: 'annunciate',
+        port: 11000,
+        handler: (action) => {
+          console.log('Annunciate walk action:', action);
+          walkNumbers();
+        }
+      }
+    ]
+  });
+}
 
 setInterval(() => {
   https.get("https://theamackers.com/storeip", () => {});
